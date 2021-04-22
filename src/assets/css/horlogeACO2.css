@@ -1,0 +1,189 @@
+body{
+	background-color: #202020;
+	color:white;
+	text-align: center;
+	font-size:1em;
+	font-family: Arial;
+	display:flex;
+}
+
+#values{
+	background-color: #181818;
+	position: fixed;
+	left: 10vw;
+	width:90vw;
+	top:0;
+}
+
+.main_container{
+	display: flex;
+	width:100%;
+	height:98vh;
+	align-items: center;
+	flex-wrap: wrap;
+	justify-content: space-around;
+}
+
+.main_value{
+	width: 100%;
+}
+
+h1{
+	position: relative;
+	bottom : 5vmin !important;
+	font-size: 4vmin !important;
+}
+
+.main_value h1{
+	bottom: 14vmin !important;
+}
+
+h2, h4{
+	line-height: 0vmin;
+	color:green;
+	font-family: ALARM, Arial;
+}
+
+h2 {
+	font-size:30vmin;
+}
+
+h4 {
+	font-size: 10vmin;
+}
+
+.unite{
+	color:white;
+	font-size: 4vmin;
+	vertical-align: middle;
+	font-family: Arial;
+	font-style: normal;
+}
+
+.sub_container{
+	height:98vh;
+	display:flex;
+	width:8vw;
+	justify-content: space-between;;
+}
+
+.mesures{
+	display:flex;
+	flex-direction: column;
+	height: 14vw;
+	justify-content: space-evenly;
+	align-self: center
+}
+
+.mesures svg{
+	fill:grey;
+}
+
+.rectActif:nth-child(n+3){
+	fill:green !important;
+}
+
+.rectActif:nth-child(-n+3){
+	fill:red !important;
+}
+
+.rectActif:nth-child(n+4):nth-child(-n+6){
+	fill:yellow !important;
+}
+
+#clock{
+	font-family:Orbitron;
+	font-size: 6vmin;
+  position: absolute;
+  left: 10px;
+  top:50%;
+  margin:0;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+	color: #0066ff;
+	letter-spacing: 7px;
+}
+
+.svg{
+	width:3vw;
+	height:3vw;
+}
+
+#boutonChanger{
+	position:absolute;
+	right:20px;
+	top:10px;
+}
+
+.nav, footer{
+	background-color: grey;
+	background-color:#202020;
+}
+
+footer{
+	position: fixed;
+	bottom: 0;
+	width: 100vw;
+	height: 7vh;
+	margin: 0;
+	text-align: center;
+	padding-left: 1vw;
+	padding-right: 1vw;
+  font-size: 3vmin;
+}
+
+.center {
+	margin: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-ms-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+}
+
+footer img{
+	position: absolute;
+	right: 10px;
+	top:50%;
+	margin:0;
+	-ms-transform: translateY(-50%);
+	transform: translateY(-50%);
+	height: 5vh;
+}
+
+.nav{
+	position: fixed;
+	top:0;
+	left: 0;
+	width:10vw;
+	height: 100vh;
+	display: flex !important;
+	flex-direction: column;
+	overflow: auto;
+}
+
+.active{
+	font-weight: bold;
+}
+
+mat-tab-group{
+  position: fixed;
+  top:0;
+  left: 0px;
+  width:10vw;
+  height: 92.7vh;
+}
+
+.mat-tab-label-content{
+  color:#0066ff;
+}
+
+@font-face {
+	font-family: "ALARM";
+	src: url("fonts/alarm\ clock.ttf");
+}
+
+@font-face {
+	font-family: "Orbitron";
+	src: url("fonts/digital-7 (mono).ttf");
+}
