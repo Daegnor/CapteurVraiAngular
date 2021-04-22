@@ -4,20 +4,25 @@
 <!--  <a id="lien_Janitza604" class="nav-link" routerLinkActive="active" routerLink="/power/Janitza 604">Janitza 604</a>-->
 <!--  <a id="lien_Janitza508" class="nav-link" routerLinkActive="active" routerLink="/power/Janitza 508">Janitza 508</a>-->
 <!--</nav>-->
-<mat-tab-group>
-  <mat-tab label="Horloges">
-    <a id="lien_horloge" class="nav-link" routerLinkActive="active" routerLink="/horloge">Horloge a CO2</a>
-  </mat-tab>
-  <mat-tab label="Capteurs Janitzas">
-    <a id="lien_Janitza604-PRO" class="nav-link" routerLinkActive="active" routerLink="/power/Janitza 604-PRO">Janitza 604-PRO</a>
-    <a id="lien_Janitza604" class="nav-link" routerLinkActive="active" routerLink="/power/Janitza 604">Janitza 604</a>
-    <a id="lien_Janitza508" class="nav-link" routerLinkActive="active" routerLink="/power/Janitza 508">Janitza 508</a>
-  </mat-tab>
-</mat-tab-group>
+<mat-drawer-container autosize class="nav-container">
+  <mat-drawer #drawer mode="side">
+    <mat-tab-group>
+      <mat-tab label="Horloges">
+        <a id="lien_horloge" class="nav-link" routerLinkActive="active" routerLink="/horloge">Horloge a CO2</a>
+      </mat-tab>
+      <mat-tab label="Capteurs Janitzas">
+        <a id="lien_Janitza604-PRO" class="nav-link" routerLinkActive="active" routerLink="/power/Janitza 604-PRO">Janitza 604-PRO</a>
+        <a id="lien_Janitza604" class="nav-link" routerLinkActive="active" routerLink="/power/Janitza 604">Janitza 604</a>
+        <a id="lien_Janitza508" class="nav-link" routerLinkActive="active" routerLink="/power/Janitza 508">Janitza 508</a>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-drawer>
 
 <div id="values">
   <router-outlet></router-outlet>
 </div>
+</mat-drawer-container>
+  <i class="material-icons" id="toggleNav" (click)="drawer.toggle()">drag_handle</i>
 <footer>
   <h5 id="clock">00:00:00</h5>
   <h5 id="nomCapteur" class="center"></h5>
