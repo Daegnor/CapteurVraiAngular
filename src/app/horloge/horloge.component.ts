@@ -27,14 +27,13 @@ export class HorlogeComponent implements OnInit, OnDestroy {
       $.ajax({
         type: 'POST',
         crossDomain: true,
-        url: 'http://localhost:8080/',
+        url: 'http://192.168.240.129:8080/',
         data: {
           capteur: 'horloge'
         },
         success: (data) => {
           try {
-            console.log(data);
-            niveauCapteurs = JSON.parse(data);
+            niveauCapteurs = data;
             setNiveau();
           } catch (error) {
             console.log(error);
