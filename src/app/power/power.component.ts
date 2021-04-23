@@ -24,7 +24,6 @@ export class PowerComponent implements OnInit, OnDestroy{
     this.intervalData = setInterval(() => getData(this.id), 5000);
 
     function getData(id): void{
-      console.log(id);
       // @ts-ignore
       $.ajax({
         type: 'POST',

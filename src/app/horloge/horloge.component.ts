@@ -49,7 +49,6 @@ export class HorlogeComponent implements OnInit, OnDestroy {
     function setNiveau(): void{
       // tslint:disable-next-line:forin
       for (const key in niveauCapteurs){
-        console.log(key);
         let valeur = niveauCapteurs[key];
         if (valeur === null) {
           valeur = -1;
