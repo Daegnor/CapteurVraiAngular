@@ -13,7 +13,6 @@ export class HorlogeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     $('#nomCapteur').text('Horloge a CO2');
-    $('#lien_horloge').addClass('active');
     const MAX = 3000;
     const NIVEAU_ALERTE = 1200;
     let niveauCapteurs = {};

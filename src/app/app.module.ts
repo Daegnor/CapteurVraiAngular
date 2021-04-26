@@ -7,7 +7,7 @@ import { PowerComponent } from './power/power.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatTabsModule} from '@angular/material/tabs';
-
+import {ChartsModule} from 'ng2-charts';
 
 @NgModule({
   declarations: [
@@ -20,7 +20,8 @@ import {MatTabsModule} from '@angular/material/tabs';
     AppRoutingModule,
     BrowserAnimationsModule,
     MatTabsModule,
-    MatSidenavModule
+    MatSidenavModule,
+    ChartsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
