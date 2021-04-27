@@ -78,7 +78,7 @@ export class PowerComponent implements OnInit, OnDestroy{
 
     function getGraphData(id): void {
       $.ajax({
-        url: 'http://localhost:8080/last24',
+        url: 'http://192.168.240.129:8080/last24',
         method: 'POST',
         crossDomain: true,
         dataType: 'json',
@@ -103,7 +103,7 @@ export class PowerComponent implements OnInit, OnDestroy{
       $.ajax({
         type: 'POST',
         crossDomain: true,
-        url: 'http://localhost:8080/',
+        url: 'http://192.168.240.129:8080/',
         data: {
           capteur: id
         },
