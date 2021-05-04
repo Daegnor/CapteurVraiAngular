@@ -77,6 +77,7 @@ export class PowerComponent implements OnInit, OnDestroy{
     }
 
     function getGraphData(id): void {
+      // @ts-ignore
       $.ajax({
         url: 'http://192.168.240.129:8080/last24',
         method: 'POST',
@@ -94,6 +95,9 @@ export class PowerComponent implements OnInit, OnDestroy{
             labels.push(data[i].time);
           }
           construireGraph(values, labels);
+        },
+        error: (data) => {
+          setTimeout(() => getGraphData(id), 1000);
         }
       });
     }
@@ -109,6 +113,7 @@ export class PowerComponent implements OnInit, OnDestroy{
         },
         success: (data) => {
           try {
+            console.log(data);
             niveauCapteurs = data;
             setNiveau();
           } catch (error) {
