@@ -3,144 +3,75 @@ import {ActivatedRoute, Router} from '@angular/router';
 import { ChartDataSets } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
 import { HttpClient } from '@angular/common/http';
+import {AppConfig} from '../app.config';
 
 @Component({
   selector: 'app-power',
   templateUrl: './power.component.html',
   styleUrls: ['./power.component.css']
 })
+/**
+ * Classe PowerComponent
+ * Controleur utilisé pour la route /power/:id
+ * Affichage les valeurs d'un capteur Janitza identifié par son id (nom)
+ */
 export class PowerComponent implements OnInit, OnDestroy{
   id: string;
   intervalData;
   intervalGraph;
+  niveauCapteurs;
+  // IP du Raspberry inscrite dans le fichier de config
+  ip = AppConfig.settings.config.ip;
 
-  constructor(private actRoute: ActivatedRoute, private router: Router) {
+  constructor(protected actRoute: ActivatedRoute, protected router: Router, protected http: HttpClient) {
+    // Récupère le paramètre :id de la route
     this.id = this.actRoute.snapshot.params.id;
+    // Force la réinitialisation du controleur lorsque le paramètre de la route change
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
   }
 
-  ngOnInit(): void {
-    $('#nomCapteur').text(this.id);
-    let niveauCapteurs = {};
+  // TODO LE GRAPH
 
-    getData(this.id);
-    this.intervalData = setInterval(() => getData(this.id), 5000);
-    getGraphData(this.id);
-    this.intervalGraph = setInterval(() => getGraphData(this.id), 3600 * 1000);
+  /**
+   * Méthode récupérant les valeurs du capteur par requête HTML
+   */
+  getData(): void{
+    this.http.post('http://' + this.ip + ':8080/', {capteur: this.id}).subscribe((data) => {
+      console.log(data);
+      this.niveauCapteurs = data;
+      this.setNiveau();
+    });
+  }
 
-    function construireGraph(values, labels): void {
-      const c = $('#graph');
-      const ctx = (c.get(0) as HTMLCanvasElement).getContext('2d');
-      // @ts-ignore
-      // tslint:disable-next-line:no-unused-expression
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Wh',
-            data: values,
-            fill: false,
-            borderColor: '#00A000',
-            pointHoverBorderColor: '#A00000'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio : false,
-          legend: {
-            labels: {
-              fontColor: 'white'
-            }
-          },
-          scales: {
-            yAxes: [{
-              gridLines: {
-                color: '#505050'
-              },
-              ticks: {
-                fontColor: 'white',
-                beginAtZero: true
-              }
-            }],
-            xAxes: [{
-              gridLines: {
-                color: '#505050'
-              },
-              ticks: {
-                fontColor: 'white'
-              }
-            }]
-          }
-        }
-      });
-    }
-
-    function getGraphData(id): void {
-      // @ts-ignore
-      $.ajax({
-        url: 'http://192.168.240.129:8080/last24',
-        method: 'POST',
-        crossDomain: true,
-        dataType: 'json',
-        data: {
-          capteur: id
-        },
-        success: (data) => {
-          const values = [];
-          const labels = [];
-          // tslint:disable-next-line:prefer-for-of
-          for (let i = 0; i < data.length; i++){
-            values.push(data[i].val);
-            labels.push(data[i].time);
-          }
-          construireGraph(values, labels);
-        },
-        error: (data) => {
-          setTimeout(() => getGraphData(id), 1000);
-        }
-      });
-    }
-
-    function getData(id): void{
-      // @ts-ignore
-      $.ajax({
-        type: 'POST',
-        crossDomain: true,
-        url: 'http://192.168.240.129:8080/',
-        data: {
-          capteur: id
-        },
-        success: (data) => {
-          try {
-            console.log(data);
-            niveauCapteurs = data;
-            setNiveau();
-          } catch (error) {
-            console.log(error);
-          }
-        },
-        fail: (data) => {
-          console.log('echec');
-          console.log(data);
-        }
-      });
-    }
-
-    function setNiveau(): void{
-      // tslint:disable-next-line:forin
-      for (const key in niveauCapteurs){
-        let valeur = niveauCapteurs[key];
-        if (valeur === null) {
-          valeur = -1;
-        }
-        $('#' + key).html(niveauCapteurs[key]);
+  /**
+   * Affiche les valeurs des capteurs sur la page
+   */
+  setNiveau(): void{
+    // tslint:disable-next-line:forin
+    for (const key in this.niveauCapteurs){
+      let valeur = this.niveauCapteurs[key];
+      if (valeur === null) {
+        valeur = -1;
       }
+      $('#' + key).html(this.niveauCapteurs[key]);
     }
   }
 
+  /**
+   * Méthode exécutant du javascript à l'ouverture de la page
+   */
+  ngOnInit(): void {
+    // Défini le nom du capteur en bas de page
+    $('#nomCapteur').text(this.id);
+    // Démarre la récupération des données toutes les 10s
+    this.getData();
+    this.intervalData = setTimeout(() => this.getData(), 1000*10);
+  }
+
+  /**
+   * Méthode exécutant du javascript lors de la fermeture de la page
+   */
   ngOnDestroy(): void {
     clearInterval(this.intervalData);
-    clearInterval(this.intervalGraph);
   }
 }

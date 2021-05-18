@@ -1,7 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {AppConfig} from '../app.config';
+import {PowerComponent} from '../power/power.component';
+import {ActivatedRoute, Router} from '@angular/router';
 
 
 @Component({
@@ -9,36 +10,26 @@ import {AppConfig} from '../app.config';
   templateUrl: './horloge.component.html',
   styleUrls: ['./horloge.component.css']
 })
-export class HorlogeComponent implements OnInit, OnDestroy {
-  intervalData;
+/**
+ * Classe HorlogeComponent
+ * Affiche les valeurs du capteurs à CO2/Température
+ * Hérite de PowerComponent
+ */
+export class HorlogeComponent extends PowerComponent implements OnInit, OnDestroy {
   intervalAlerte;
-  niveauCapteurs;
   MAX = 3000;
   NIVEAU_ALERTE = 1200;
   ip = AppConfig.settings.config.ip;
 
-  constructor(private http: HttpClient) {}
-
-  getData(): void{
-
-    this.http.post('http://' + this.ip + ':8080/', {capteur: 'horloge'}).subscribe((data) => {
-      console.log(data);
-      this.niveauCapteurs = data;
-      this.setNiveau();
-    });
+  constructor(protected actRoute: ActivatedRoute, protected router: Router, protected http: HttpClient) {
+    super(actRoute, router, http);
+    this.id = 'horloge';
   }
 
   setNiveau(): void{
-    // tslint:disable-next-line:forin
-    for (const key in this.niveauCapteurs){
-      let valeur = this.niveauCapteurs[key];
-      if (valeur === null) {
-        valeur = -1;
-      }
-      $('#' + key).html(this.niveauCapteurs[key]);
-    }
+    super.setNiveau();
 
-
+    // Initialise l'alarme si la valeur de CO2 est supérieure à NIVEAU_ALERTE
     if (! this.niveauCapteurs.hasOwnProperty('co2')) {
       return;
     }
@@ -66,6 +57,9 @@ export class HorlogeComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Méthode effectuant une alerte (passage du fond en rouge, puis de nouveau en noir au bout d'une seconde)
+   */
   alerte(): void{
     $('body').css('background-color', 'red');
     setTimeout(() => {
@@ -73,6 +67,9 @@ export class HorlogeComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
+  /**
+   * Méthode réinitialisant les rectangles à coté des smileys
+   */
   clearRect(): void{
     $('.rectActif').each(() => {
       $(this).removeClass('rectActif');
@@ -80,13 +77,12 @@ export class HorlogeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    $('#nomCapteur').text('Horloge a CO2');
-    this.getData();
-    this.intervalData = setTimeout(() => this.getData(), 5000);
+    super.ngOnInit();
+    $('#nomCapteur').text(this.id);
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.intervalData);
+    super.ngOnDestroy();
     if (this.intervalAlerte) {
       clearInterval(this.intervalAlerte);
     }
