@@ -45,13 +45,13 @@ ssh pi@<ip du raspberry>
 Par WinSCP :
 
 1. Télécharger et installer WinSCP : https://winscp.net/eng/download.php
-2. Configurer l'accès au Raspberry![image-20210518164259623](.\images_doc\image-20210518164259623.png)
+2. Configurer l'accès au Raspberry![image-20210518164259623](/images_doc/image-20210518164259623.png)
    1. Protocol : SFTP pour transfert par SSH
    2. Nom d'hôte : Adresse IP du Raspberry
    3. Nom d'utilisateur : Nom d'utilisateur sur le Raspberry
    4. Mot de passe : mot de passe de session du Raspberry
 3. Cliquer sur "Connecter"
-4. ![image-20210518164537231](.\images_doc\image-20210518164537231.png)
+4. ![image-20210518164537231](/images_doc/image-20210518164537231.png)
    1. Partie gauche : Fichiers locaux
    2. Partie droite : Fichiers du Raspberry
 
