@@ -15,12 +15,11 @@ import {ActivatedRoute, Router} from '@angular/router';
  * Hérite de PowerComponent
  */
 export class HorlogeGraphComponent extends PowerComponent implements OnInit, OnDestroy {
-  nomValeur: string;
-  unite: string;
 
   constructor(protected actRoute: ActivatedRoute, protected router: Router, protected http: HttpClient) {
     super(actRoute, router, http);
     this.id = 'horloge';
+    this.unite = 'PPM';
   }
 
   ngOnInit(): void {

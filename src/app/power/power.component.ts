@@ -18,6 +18,7 @@ import { map } from 'rxjs/operators';
  */
 export class PowerComponent implements OnInit, OnDestroy{
   protected id: string;
+  protected unite: string;
   protected intervalData;
   protected intervalGraph;
   protected niveauCapteurs;
@@ -27,6 +28,7 @@ export class PowerComponent implements OnInit, OnDestroy{
   constructor(protected actRoute: ActivatedRoute, protected router: Router, protected http: HttpClient) {
     // Récupère le paramètre :id de la route
     this.id = this.actRoute.snapshot.params.id;
+    this.unite = 'Wh';
     // Force la réinitialisation du controleur lorsque le paramètre de la route change
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
   }
@@ -67,7 +69,7 @@ export class PowerComponent implements OnInit, OnDestroy{
       data: {
         labels,
         datasets: [{
-          label: 'Wh',
+          label: this.unite,
           data: values,
           fill: false,
           borderColor: '#00A000',
@@ -127,7 +129,7 @@ export class PowerComponent implements OnInit, OnDestroy{
     $('#nomCapteur').text(this.id);
     // Démarre la récupération des données toutes les 10s
     this.getData();
-    this.intervalData = setTimeout(() => this.getData(), 1000 * 10);
+    this.intervalData = setInterval(() => this.getData(), 1000 * 10);
     this.getGraphData();
     this.intervalGraph = setInterval(() => this.getGraphData(), 3600 * 1000);
   }
