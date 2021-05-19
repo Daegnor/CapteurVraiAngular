@@ -48,8 +48,8 @@ Par WinSCP :
 2. Configurer l'accès au Raspberry![image-20210518164259623](/images_doc/image-20210518164259623.png)
    1. Protocol : SFTP pour transfert par SSH
    2. Nom d'hôte : Adresse IP du Raspberry
-   3. Nom d'utilisateur : Nom d'utilisateur sur le Raspberry
-   4. Mot de passe : mot de passe de session du Raspberry
+   3. Nom d'utilisateur : pi
+   4. Mot de passe : raspberry
 3. Cliquer sur "Connecter"
 4. ![image-20210518164537231](/images_doc/image-20210518164537231.png)
    1. Partie gauche : Fichiers locaux
@@ -59,9 +59,9 @@ Par WinSCP :
 
 ~/scriptNodeJS : Dossier contenant les scripts pour le nodejs, c'est-à-dire le script récupérant les valeurs du MQTT et établissant un serveur web pour les récupérer
 
-~/site_web/CapteurVraiAngular-master : Dossier contenant le site web Angular
+~/scriptNodeJS/CapteurVraiAngular : Dossier contenant le site web Angular (version production)
 
-Si CapteurVraiAngular-master n'existe pas, le cloner
+Les fichiers sources peuvent être obtenu en clonant le repository
 
 ```
 git clone https://github.com/Daegnor/CapteurVraiAngular
@@ -81,7 +81,7 @@ npm i body-parser cors express path mqtt ip --save
 
 ### Angular
 
-Dans le fichier ~/site_web/CapteurVraiAngular-master/assets/config/config.development.json, changer la valeur de "host" pour l'adresse ip du raspberry.
+Dans le fichier ~/scriptNodeJS/CapteurVraiAngular/assets/config/config.prod.json, changer la valeur de "host" pour l'adresse ip du raspberry.
 
 Exemple :
 
@@ -92,49 +92,27 @@ Exemple :
   }
 ```
 
-Modifier également la partie scripts : start du fichier package.json afin d'y mettre l'adresse du raspberry
-
-```
-nano ~/site_web/CapteurVraiAngular-master/package.json
-```
-
-```
-...
-"scripts": {
-    "ng": "ng",
-    "start": "ng serve --host 192.168.240.127",
-    ...
-  },
-```
-
 ## Lancement
 
-Normalement des services s'occupent de lancer les 2 serveurs web.
+Normalement des services s'occupent de lancer les 2 serveurs web (attendre environs 1 minute au démarrage du Raspberry).
 
 Si ce n'est pas le cas : 
 
 1. S'assurer que mosquitto est lancé sur le port 1883 (normalement il se lance par défaut)
 
-2. Lancer le fichier server.js 
+2. Lancer le fichier serveurNodeJS.js 
 
    ```
    cd ~/scriptNodeJS
-   nodejs server.js &
+   nodejs serveurNodeJS.js &
    ```
 
-3. Vérifier que les dépendances du site web sont installées
+3. Lancer le site web angular
 
    ```
-   cd ~/site_web/CapteurVraiAngular-master
-   npm install
+   cd ~/scriptNodeJS
+   nodejs serveurAngular.js
    ```
 
-4. Lancer le site web (peut être un peu long)
-
-   ```
-   cd ~/site_web/CapteurVraiAngular-master
-   npm start
-   ```
-
-5. Se connecter au site à l'adresse IP indiquée dans le fichier config, au port 4200
+4. Se connecter au site à l'adresse IP indiquée dans le fichier config, port 80
 

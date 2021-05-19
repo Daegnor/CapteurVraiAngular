@@ -1,6 +1,6 @@
 {
   "env": {
-    "name": "DEV"
+    "name": "#{envName}"
   },
   "config": {
     "ip": "test.eai.fr"

@@ -2,8 +2,9 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import { ChartDataSets } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {AppConfig} from '../app.config';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-power',
@@ -16,12 +17,12 @@ import {AppConfig} from '../app.config';
  * Affichage les valeurs d'un capteur Janitza identifié par son id (nom)
  */
 export class PowerComponent implements OnInit, OnDestroy{
-  id: string;
-  intervalData;
-  intervalGraph;
-  niveauCapteurs;
+  protected id: string;
+  protected intervalData;
+  protected intervalGraph;
+  protected niveauCapteurs;
   // IP du Raspberry inscrite dans le fichier de config
-  ip = AppConfig.settings.config.ip;
+  protected ip = AppConfig.settings.config.ip;
 
   constructor(protected actRoute: ActivatedRoute, protected router: Router, protected http: HttpClient) {
     // Récupère le paramètre :id de la route
@@ -30,17 +31,16 @@ export class PowerComponent implements OnInit, OnDestroy{
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
   }
 
-  // TODO LE GRAPH
-
   /**
    * Méthode récupérant les valeurs du capteur par requête HTML
+   * Passe par du JsonP pour éviter les problèmes de cross-origin
    */
   getData(): void{
-    this.http.post('http://' + this.ip + ':8080/', {capteur: this.id}).subscribe((data) => {
+    this.http.jsonp('https://' + this.ip + '/Ajax/GetValues?capteur=' + this.id, 'callback').pipe(map(data => {
       console.log(data);
       this.niveauCapteurs = data;
       this.setNiveau();
-    });
+    })).subscribe(data => {});
   }
 
   /**
@@ -57,6 +57,68 @@ export class PowerComponent implements OnInit, OnDestroy{
     }
   }
 
+  construireGraph(values, labels): void {
+    const c = $('#graph');
+    const ctx = (c.get(0) as HTMLCanvasElement).getContext('2d');
+    // @ts-ignore
+    // tslint:disable-next-line:no-unused-expression
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Wh',
+          data: values,
+          fill: false,
+          borderColor: '#00A000',
+          pointHoverBorderColor: '#A00000'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio : false,
+        legend: {
+          labels: {
+            fontColor: 'white'
+          }
+        },
+        scales: {
+          yAxes: [{
+            gridLines: {
+              color: '#505050'
+            },
+            ticks: {
+              fontColor: 'white',
+              beginAtZero: true
+            }
+          }],
+          xAxes: [{
+            gridLines: {
+              color: '#505050'
+            },
+            ticks: {
+              fontColor: 'white'
+            }
+          }]
+        }
+      }
+    });
+  }
+
+  getGraphData(): void {
+    this.http.jsonp('https://' + this.ip + '/Ajax/Last24?capteur=' + this.id + '&nomValeur=co2', 'callback').pipe(map(data => {
+      console.log(data);
+      const values = [];
+      const labels = [];
+      // tslint:disable-next-line:prefer-for-of
+      for (let i = Object.keys(data).length - 1; i >= 0; i--){
+        values.push(data[i].value);
+        labels.push(data[i].time + ':00');
+      }
+      this.construireGraph(values, labels);
+    })).subscribe(data => {});
+  }
+
   /**
    * Méthode exécutant du javascript à l'ouverture de la page
    */
@@ -65,7 +127,9 @@ export class PowerComponent implements OnInit, OnDestroy{
     $('#nomCapteur').text(this.id);
     // Démarre la récupération des données toutes les 10s
     this.getData();
-    this.intervalData = setTimeout(() => this.getData(), 1000*10);
+    this.intervalData = setTimeout(() => this.getData(), 1000 * 10);
+    this.getGraphData();
+    this.intervalGraph = setInterval(() => this.getGraphData(), 3600 * 1000);
   }
 
   /**

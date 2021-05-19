@@ -8,9 +8,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatTabsModule} from '@angular/material/tabs';
 import {ChartsModule} from 'ng2-charts';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClientJsonpModule } from '@angular/common/http';
 import { APP_INITIALIZER } from '@angular/core';
 import { AppConfig } from './app.config';
+import {HorlogeGraphComponent} from './horlogeGraph/horlogeGraph.component';
 
 // tslint:disable-next-line:typedef
 export function initializeApp(appConfig: AppConfig) {
@@ -20,6 +21,7 @@ export function initializeApp(appConfig: AppConfig) {
   declarations: [
     AppComponent,
     HorlogeComponent,
+    HorlogeGraphComponent,
     PowerComponent
   ],
   imports: [
@@ -30,6 +32,7 @@ export function initializeApp(appConfig: AppConfig) {
     MatSidenavModule,
     ChartsModule,
     HttpClientModule,
+    HttpClientJsonpModule
   ],
   providers: [
     AppConfig,

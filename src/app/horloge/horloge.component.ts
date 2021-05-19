@@ -1,8 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {AppConfig} from '../app.config';
-import {PowerComponent} from '../power/power.component';
 import {ActivatedRoute, Router} from '@angular/router';
+import {HorlogeGraphComponent} from '../horlogeGraph/horlogeGraph.component';
 
 
 @Component({
@@ -11,19 +10,17 @@ import {ActivatedRoute, Router} from '@angular/router';
   styleUrls: ['./horloge.component.css']
 })
 /**
- * Classe HorlogeComponent
+ * Classe HorlogeGraphComponent
  * Affiche les valeurs du capteurs à CO2/Température
  * Hérite de PowerComponent
  */
-export class HorlogeComponent extends PowerComponent implements OnInit, OnDestroy {
+export class HorlogeComponent extends HorlogeGraphComponent implements OnInit, OnDestroy {
   intervalAlerte;
   MAX = 3000;
   NIVEAU_ALERTE = 1200;
-  ip = AppConfig.settings.config.ip;
 
   constructor(protected actRoute: ActivatedRoute, protected router: Router, protected http: HttpClient) {
     super(actRoute, router, http);
-    this.id = 'horloge';
   }
 
   setNiveau(): void{
@@ -34,7 +31,7 @@ export class HorlogeComponent extends PowerComponent implements OnInit, OnDestro
       return;
     }
     // @ts-ignore
-    let niveauCO2 = niveauCapteurs.co2;
+    let niveauCO2 = this.niveauCapteurs.co2;
 
     if (niveauCO2 > this.MAX) {
       niveauCO2 = this.MAX;
@@ -76,9 +73,16 @@ export class HorlogeComponent extends PowerComponent implements OnInit, OnDestro
     });
   }
 
+  getGraphData(): void {
+    return;
+  }
+
   ngOnInit(): void {
     super.ngOnInit();
-    $('#nomCapteur').text(this.id);
+    clearInterval(this.intervalGraph);
+  }
+
+  remplacerTitres(): void{
   }
 
   ngOnDestroy(): void {
