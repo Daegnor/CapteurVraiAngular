@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import { ChartDataSets } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
@@ -17,8 +17,8 @@ import { map } from 'rxjs/operators';
  * Affichage les valeurs d'un capteur Janitza identifié par son id (nom)
  */
 export class PowerComponent implements OnInit, OnDestroy{
-  protected id: string;
-  protected unite: string;
+  id: string;
+  unite: string;
   protected intervalData;
   protected intervalGraph;
   protected niveauCapteurs;
@@ -28,7 +28,7 @@ export class PowerComponent implements OnInit, OnDestroy{
   constructor(protected actRoute: ActivatedRoute, protected router: Router, protected http: HttpClient) {
     // Récupère le paramètre :id de la route
     this.id = this.actRoute.snapshot.params.id;
-    this.unite = 'Wh';
+    this.unite = 'kW';
     // Force la réinitialisation du controleur lorsque le paramètre de la route change
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
   }
@@ -39,7 +39,7 @@ export class PowerComponent implements OnInit, OnDestroy{
    */
   getData(): void{
     this.http.jsonp('https://' + this.ip + '/Ajax/GetValues?capteur=' + this.id, 'callback').pipe(map(data => {
-      console.log(data);
+      // console.log(data);
       this.niveauCapteurs = data;
       this.setNiveau();
     })).subscribe(data => {});
@@ -109,15 +109,18 @@ export class PowerComponent implements OnInit, OnDestroy{
 
   getGraphData(): void {
     this.http.jsonp('https://' + this.ip + '/Ajax/Last24?capteur=' + this.id + '&nomValeur=co2', 'callback').pipe(map(data => {
-      console.log(data);
+      // console.log(data);
       const values = [];
       const labels = [];
       // tslint:disable-next-line:prefer-for-of
-      for (let i = Object.keys(data).length - 1; i >= 0; i--){
+      for (let i = 0; i < Object.keys(data).length; i++){
         values.push(data[i].value);
         labels.push(data[i].time + ':00');
       }
       this.construireGraph(values, labels);
+
+      const timeUntilNewHour = 60 - new Date().getMinutes();
+      setTimeout(() => location.reload(), timeUntilNewHour * 60 * 1000);
     })).subscribe(data => {});
   }
 
@@ -131,7 +134,7 @@ export class PowerComponent implements OnInit, OnDestroy{
     this.getData();
     this.intervalData = setInterval(() => this.getData(), 1000 * 10);
     this.getGraphData();
-    this.intervalGraph = setInterval(() => this.getGraphData(), 3600 * 1000);
+    // this.intervalGraph = setInterval(() => this.getGraphData(), 10 * 1000);
   }
 
   /**

@@ -1,8 +1,11 @@
 <a id="boutonGraph" type="button" class="btn btn-primary" routerLinkActive="active" routerLink="/horloge">Horloge</a>
-<app-power></app-power>
-
-<script>
-  $(function(){
-
-  })
-</script>
+<div class="main_container">
+  <div class="main_value">
+    <h1 id="titreH1">CO<sub>2</sub> Monitor</h1>
+    <h2><span id="co2"></span><span class="unite"> {{this.unite}}</span></h2>
+  </div>
+  <div class="chart-wrapper">
+    <canvas id="graph">
+    </canvas>
+  </div>
+</div>
