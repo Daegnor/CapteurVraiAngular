@@ -1,23 +1,26 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../environments/environment';
-import { IAppConfig } from './app-config.module';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {environment} from '../environments/environment';
+import {IAppConfig} from './app-config.module';
 
 @Injectable()
 export class AppConfig {
-  static settings: IAppConfig;
-  constructor(private http: HttpClient) {}
-  // tslint:disable-next-line:typedef
-  load() {
-    // Fichier de configuration, récupéré en fonction du nom défini dans le fichier environnement
-    const jsonFile = `assets/config/config.${environment.name}.json`;
-    return new Promise<void>((resolve, reject) => {
-      this.http.get(jsonFile).toPromise().then((response: IAppConfig) => {
-        AppConfig.settings = (response as IAppConfig);
-        resolve();
-      }).catch((response: any) => {
-        reject(`Could not load file '${jsonFile}': ${JSON.stringify(response)}`);
-      });
-    });
-  }
+	static settings: IAppConfig;
+
+	constructor(private http: HttpClient) {
+	}
+
+	// tslint:disable-next-line:typedef
+	load() {
+		// Fichier de configuration, récupéré en fonction du nom défini dans le fichier environnement
+		const jsonFile = `assets/config/config.${environment.name}.json`;
+		return new Promise<void>((resolve, reject) => {
+			this.http.get(jsonFile).toPromise().then((response: IAppConfig) => {
+				AppConfig.settings = (response as IAppConfig);
+				resolve();
+			}).catch((response: any) => {
+				reject(`Could not load file '${jsonFile}': ${JSON.stringify(response)}`);
+			});
+		});
+	}
 }

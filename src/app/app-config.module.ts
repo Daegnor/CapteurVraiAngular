@@ -1,8 +1,8 @@
 export interface IAppConfig {
-  env: {
-    name: string;
-  };
-  config: {
-    ip: string;
-  };
+	env: {
+		name: string;
+	};
+	config: {
+		ip: string;
+	};
 }
