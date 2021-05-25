@@ -223,19 +223,28 @@ function sendGraphValues(res, capteur) {
 	reponse = [];
 	// TODO récupération des données sur 24h
 
-	// db.all(requeteSQL, [capteur], (err, rows) => {
-	// 	if (err) {
-	// 		console.error(err.message);
-	// 		return;
-	// 	}
-	// 	rows.forEach((row) => {
-	// 		let tmp = {};
-	// 		tmp.val = row.VAL_DATA;
-	// 		tmp.time = row.DTE_DATA.split(" ")[1];
-	// 		reponse.unshift(tmp);
-	// 	});
-	// 	res.send(reponse);
-	// });
+	let db = new tedious.Connection(config);
+	db.on('connect', (err) => {
+		if (err) {
+			console.log(err);
+			return;
+		}
+		request = new Request(requeteGet);
+		request.addParameter('Capteur', TYPES.NVarChar, capteur);
+
+		//Enregistrement des valeurs des tuples dans reponse
+		request.on('row', function (columns) {
+			reponse[columns[0].value] = columns[1].value
+		});
+
+		//Lorsque la request se termine, on renvoie reponse
+		request.callback = () => {
+			db.close();
+			res.jsonp(reponse);
+		}
+		db.execSql(request);
+	});
+	db.connect();
 }
 
 serveurAPI.listen(portAPI, () => {

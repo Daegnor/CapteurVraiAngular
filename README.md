@@ -16,7 +16,7 @@ Ensuite, indiquer l'adresse du Raspberry dans la variable mqtt_server
 
 ## Introduction
 
-​	Projet github disponible sur https://github.com/Daegnor/CapteurVraiAngular
+​	Projet github disponible sur https://github.com/Daegnor/Site_Angular_Capteurs
 
 ```
 git clone https://github.com/Daegnor/Site_Angular_Capteurs.git
@@ -72,7 +72,7 @@ Par WinSCP :
 ## Hiérarchie du dossier
 
 - dist -> Fichier de sortie des builds (non présent par défaut)
-- ServeurNodeJS -> Contient les fichiers pour faire le serveur web pour récupérer les données des capteurs (à coté du serveur pour Angular)
+- ServeurNodeJS -> Contient les fichiers pour faire l'API (à coté du serveur pour Angular)
   - init.sql -> Fichier d'initialisation pour la base de données
   - installer_dependances_serveurNodeJS.sh -> Script pour installer les dépendances du serveur
   - serveurNodeJS -> Fichier NodeJS du serveur
