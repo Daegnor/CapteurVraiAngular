@@ -20,6 +20,8 @@ export class HorlogeGraphComponent extends PowerComponent implements OnInit, OnD
     super(actRoute, router, http);
     this.id = 'horloge';
     this.unite = 'PPM';
+    this.nomValeur = 'co2';
+    this.beginAtZero = true;
   }
 
   ngOnInit(): void {

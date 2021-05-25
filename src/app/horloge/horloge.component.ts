@@ -12,11 +12,11 @@ import {HorlogeGraphComponent} from '../horlogeGraph/horlogeGraph.component';
 /**
  * Classe HorlogeGraphComponent
  * Affiche les valeurs du capteurs à CO2/Température
- * Hérite de PowerComponent
+ * Hérite de HorlogeGraphComponent
  */
 export class HorlogeComponent extends HorlogeGraphComponent implements OnInit, OnDestroy {
-  intervalAlerte;
-  MAX = 3000;
+  intervalAlerte = null;
+  // Constante définissant le déclenchement de l'alarme
   NIVEAU_ALERTE = 1200;
 
   constructor(protected actRoute: ActivatedRoute, protected router: Router, protected http: HttpClient) {
@@ -26,23 +26,12 @@ export class HorlogeComponent extends HorlogeGraphComponent implements OnInit, O
   setNiveau(): void{
     super.setNiveau();
 
-    // Initialise l'alarme si la valeur de CO2 est supérieure à NIVEAU_ALERTE
+    // Initialise l'alarme si la valeur de CO2 est supérieure à NIVEAU_ALERTE, ou l'arrête si inférieur
     if (! this.niveauCapteurs.hasOwnProperty('co2')) {
       return;
     }
-    // @ts-ignore
-    let niveauCO2 = this.niveauCapteurs.co2;
 
-    if (niveauCO2 > this.MAX) {
-      niveauCO2 = this.MAX;
-    }
-
-    const nbChild = niveauCO2 / (this.MAX / 10) + 1;
-    this.clearRect();
-
-    for (let i = 0; i <= nbChild; i++) {
-      $($('#barres').children()[$('#barres').children().length - i]).addClass('rectActif');
-    }
+    const niveauCO2 = this.niveauCapteurs.co2;
 
     if (niveauCO2 >= this.NIVEAU_ALERTE && this.intervalAlerte === null){
       this.alerte();
@@ -58,31 +47,14 @@ export class HorlogeComponent extends HorlogeGraphComponent implements OnInit, O
    * Méthode effectuant une alerte (passage du fond en rouge, puis de nouveau en noir au bout d'une seconde)
    */
   alerte(): void{
-    $('body').css('background-color', 'red');
+    $('.main_container').css('background-color', 'red');
     setTimeout(() => {
-      $('body').css('background-color', 'black');
+      $('.main_container').css('background-color', 'black');
     }, 1000);
-  }
-
-  /**
-   * Méthode réinitialisant les rectangles à coté des smileys
-   */
-  clearRect(): void{
-    $('.rectActif').each(() => {
-      $(this).removeClass('rectActif');
-    });
   }
 
   getGraphData(): void {
     return;
-  }
-
-  ngOnInit(): void {
-    super.ngOnInit();
-    clearInterval(this.intervalGraph);
-  }
-
-  remplacerTitres(): void{
   }
 
   ngOnDestroy(): void {

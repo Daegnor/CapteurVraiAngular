@@ -3,6 +3,6 @@
     "name": "DEV"
   },
   "config": {
-    "ip": "test.eai.fr"
+    "ip": "https://test.eai.fr"
   }
 }

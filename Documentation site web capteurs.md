@@ -18,6 +18,10 @@ Ensuite, indiquer l'adresse du Raspberry dans la variable mqtt_server
 
 ​	Projet github disponible sur https://github.com/Daegnor/CapteurVraiAngular
 
+```
+git clone https://github.com/Daegnor/Site_Angular_Capteurs.git
+```
+
 ## Pré-requis
 
 MQTT : Mosquitto
@@ -65,64 +69,179 @@ Par WinSCP :
    1. Partie gauche : Fichiers locaux
    2. Partie droite : Fichiers du Raspberry
 
-## Disposition des programmes
+## Hiérarchie du dossier
 
-~/scriptNodeJS : Dossier contenant les scripts pour le nodejs, c'est-à-dire le script récupérant les valeurs du MQTT et établissant un serveur web pour les récupérer
-
-~/scriptNodeJS/CapteurVraiAngular : Dossier contenant le site web Angular (version production)
-
-Les fichiers sources peuvent être obtenu en clonant le repository
-
-```
-git clone https://github.com/Daegnor/CapteurVraiAngular
-```
+- dist -> Fichier de sortie des builds (non présent par défaut)
+- ServeurNodeJS -> Contient les fichiers pour faire le serveur web pour récupérer les données des capteurs (à coté du serveur pour Angular)
+  - init.sql -> Fichier d'initialisation pour la base de données
+  - installer_dependances_serveurNodeJS.sh -> Script pour installer les dépendances du serveur
+  - serveurNodeJS -> Fichier NodeJS du serveur
+- src
+  - app -> Dossier contenant les fichiers du site web
+    - horloge -> Dossier contenant le contrôleur (component en Angular) pour l'horloge (page par défaut lorsqu'on arrive sur le site)
+      - horloge.component.css -> CSS pour le template d'horloge
+      - horloge.component.html -> Template d'horloge
+      - horloge.component.ts -> Fichier définissant le contrôleur d'horloge
+    - horlogeGraph -> Dossier contenant le contrôleur pour la version de l'horloge contenant le graphique (même hiérarchie qu'horloge)
+      - ...
+    - power -> Dossier contenant le contrôleur pour les pages des capteurs Janitza (même hiérarchie qu'horloge)
+      - ...
+    - app.component.css -> css utilisé sur toutes les pages
+    - app.component.html -> template html utilisé sur toutes les pages, équivalent au _Layout en ASP.NET MVC
+    - app.component.ts -> Fichier définissant le contrôleur de app (contrôleur par défaut)
+    - app.config.ts -> Fichier définissant la classe AppConfig, permettant de récupérer les variables des fichiers config
+    - app.module.ts -> Fichier définissant les contrôleurs, permettant l'import de modules et définissant les providers (services d'Angular)
+    - app-config.module.ts -> Interface pour le provider de configuration comme AppConfig
+    - app-routing.module.ts -> Fichier allouant les routes aux contrôleurs
+  - assets -> Contient les fichiers ressources envoyés au client, comme le CSS ou les images
+    - config -> Dossier contenant les fichiers de configuration (notamment l'ip utilisée pour ajax)
+      - config.prod.json -> configuration pour la production
+      - config.dev.json -> configuration pour le développement
+  - environnements -> Contient les fichiers .ts contenant les variables d'environnements. 
+    - environnement.prod.ts -> Variables d'environnement pour le site de production, comme le nom de l'environnement pour trouver le fichier de config
+    - environnement.ts -> Variable d'environnement pour le site en développement
 
 ## Configuration
 
 ### NodeJS
 
-Aucune configuration requise dans le fichier server.js.
-
-S'il s'agit d'une nouvelle installation, installer les package requis (depuis le dossier ~/scriptNodeJS) : 
+Configurer l'accès à la base de données
 
 ```
-npm i body-parser cors express path mqtt ip --save
+...
+var config = {
+    server: '',  //update me
+    authentication: {
+        type: 'default',
+        options: {
+            userName: '', //update me
+            password: ''  //update me
+        }
+    },
+    options: {
+        // If you are on Microsoft Azure, you need encryption:
+        encrypt: false,
+        database: 'WEBEAIDB'  //update me
+    }
+};
+...
+```
+
+Si le serveur MQTT n'est pas sur la même machine, changer adresseIP :
+
+```
+...
+//Client MQTT
+var adresseIP = ip.address() //Remplacer l'adresse si le serveur MQTT n'est pas hébergé sur la même machine
+var clientMQTT = mqtt.connect("mqtt://"+ adresseIP,{clientId:"nodejs_recept", port:"1883"});
+...
+```
+
+S'il s'agit d'une nouvelle installation, installer les package requis : 
+
+```
+./installer_dependances_serveurNodeJS
 ```
 
 ### Angular
 
-Dans le fichier ~/scriptNodeJS/CapteurVraiAngular/assets/config/config.prod.json, changer la valeur de "host" pour l'adresse ip du raspberry.
+Dans les fichier assets/config/config.dev.json, changer la valeur de "host" pour l'adresse de l'API (raspberry par défaut).
 
 Exemple :
 
 ```
 ...
 "config": {
-    "ip": "192.168.240.127"
-  }
+    "ip": "http://192.168.240.127"
+}
 ```
 
-## Lancement
+- - 
 
-Normalement des services s'occupent de lancer les 2 serveurs web (attendre environs 1 minute au démarrage du Raspberry).
+## Développement
 
-Si ce n'est pas le cas : 
+### NodeJS
 
-1. S'assurer que mosquitto est lancé sur le port 1883 (normalement il se lance par défaut)
+Le fichier est intégralement commenté.
 
-2. Lancer le fichier serveurNodeJS.js 
+Pour les adresses des valeurs des capteurs Janitza, elles sont disponibles sur la documentation fournie : https://www.janitza.com/manuals.html?file=files/download/manuals/current/UMG604-PRO/janitza-mal-umg604pro-en.pdf
 
-   ```
-   cd ~/scriptNodeJS
-   nodejs serveurNodeJS.js &
-   ```
+Documentation des packages principalement utilisés :
 
-3. Lancer le site web angular
+Express : https://expressjs.com/en/5x/api.html
 
-   ```
-   cd ~/scriptNodeJS
-   nodejs serveurAngular.js
-   ```
+Modbus : https://www.npmjs.com/package/modbus-serial
 
-4. Se connecter au site à l'adresse IP indiquée dans le fichier config, port 80
+MQTT : https://www.npmjs.com/package/mqtt
+
+Tedious (Pour SQLServer) : http://tediousjs.github.io/tedious/
+
+### Angular
+
+Pour ajouter un contrôleur, utiliser les commandes AngularCLI (voir : https://angular.io/tutorial/toh-pt3), puis définir la route dans app-routing.module.ts
+
+Pour le développement en détail d'un contrôleur, se référer aux commentaires des contrôleurs déjà existant.
+
+## Passer en production
+
+Changer l'ip indiquée dans le fichier assets/config/config.prod.json :
+
+```
+...
+"config": {
+    "ip": "http://192.168.240.127"
+}
+```
+
+Pour passer le site Angular en production, exécuter le script prod :
+
+```
+npm run-script prod
+```
+
+Puis placer les fichiers du répertoire dist dans un serveur web. Rediriger toutes les routes vers index.html.
+
+## Lancement 
+
+Pour lancer le serveurNodeJS :
+
+```
+nodejs serveurNodeJS
+```
+
+ Pour le site Angular (en développement, sinon se référer à Passer en production) :
+
+```
+npm start
+```
+
+En production, un script peut être fait pour lancer serveurNodeJS
+
+```
+sudo nano /etc/systemd/system/serveurNodeJS.service
+```
+
+```
+[Unit]
+Description=Serveur de valeur des capteurs NodeJS
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+ExecStartPre=/bin/sleep 60
+ExecStart=/usr/bin/nodejs [chemin vers le fichier]/serveurNodeJS.js
+Type=simple
+User=root
+WorkingDirectory=[chemin vers le fichier]
+Restart=on-failure
+```
+
+Puis
+
+```
+sudo systemctl daemon-reload
+sudo systemctl enable serveurNodeJS.service
+```
 

@@ -9,6 +9,7 @@ export class AppConfig {
   constructor(private http: HttpClient) {}
   // tslint:disable-next-line:typedef
   load() {
+    // Fichier de configuration, récupéré en fonction du nom défini dans le fichier environnement
     const jsonFile = `assets/config/config.${environment.name}.json`;
     return new Promise<void>((resolve, reject) => {
       this.http.get(jsonFile).toPromise().then((response: IAppConfig) => {
