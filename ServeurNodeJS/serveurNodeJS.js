@@ -2,8 +2,6 @@
 //Module body-parser
 //permet de récupérer les données data de la requête ajax
 const bodyParser = require('body-parser');
-//CORS
-const cors = require('cors');
 //Module serveur web express
 const express = require('express');
 //Module mqtt
@@ -170,7 +168,6 @@ function sendJanitzaData(nom, parametre, err, data) {
 //Creation du serveur web permettant la récupération des données des capteurs, au port 8080
 serveurAPI.use(bodyParser.urlencoded({extended: false}));
 serveurAPI.use(bodyParser.json());
-serveurAPI.use(cors());
 
 serveurAPI.get("/Ajax/GetValues", function (req, res) {
 	let capteur = req.query.capteur;
@@ -260,7 +257,7 @@ function sendGraphValues(res, capteur, nomValeur) {
 			let date = new Date(columns[1].value);
 			//Si le tuple a une heure différente du dernier enregistrer
 			if(lastHeure == null || lastHeure !== (date.getHours()-1)){
-				//date est avancée de 2h à cause de la correction de tedious, et on enregistre la moyenne des valeurs enregistrée est indiqué pour l'heure suivante
+				//date est avancée de 2h à cause de la correction de tedious, et la moyenne des valeurs enregistrée est indiqué pour l'heure suivante
 				//donc on enregistre lastHeure comme étant l'heure de date -1 (donc l'heure de l'enregistrement + 1)
 				//Exemple : la moyenne des valeurs de 8h à 9h est indiquée à 9h
 				lastHeure = (date.getHours()-1);
