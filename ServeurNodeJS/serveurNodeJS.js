@@ -38,8 +38,7 @@ var requeteInsert = "INSERT INTO DATA(LIB_DATA, VAL_DATA, DTE_DATA, CLE_SENSOR) 
 
 var requeteGet = "SELECT LIB_DATA, VAL_DATA FROM DATA WHERE CLE_DATA IN (SELECT MAX(CLE_DATA) from DATA GROUP BY CLE_SENSOR, LIB_DATA HAVING CLE_SENSOR = (SELECT CLE_SENSOR from SENSOR where LIB_SENSOR LIKE @Capteur));";
 
-//TODO requete pour obtenir les valeurs sur les dernières 24h
-var requeteGraph = "";
+var requeteGraph = "SELECT VAL_DATA, DTE_DATA FROM DATA WHERE DTE_DATA >= @Yesterday and DTE_DATA < @Today and LIB_DATA LIKE @Lib and CLE_SENSOR = (SELECT CLE_SENSOR from SENSOR where LIB_SENSOR LIKE @Capteur) ORDER BY DTE_DATA ASC";
 
 //Clients modbus
 var serveurAPI = express();
@@ -170,7 +169,7 @@ function sendJanitzaData(nom, parametre, err, data) {
 
 //Creation du serveur web permettant la récupération des données des capteurs, au port 8080
 serveurAPI.use(bodyParser.urlencoded({extended: false}));
-serveurAPI.use(bodyParser.jsonp());
+serveurAPI.use(bodyParser.json());
 serveurAPI.use(cors());
 
 serveurAPI.get("/Ajax/GetValues", function (req, res) {
@@ -211,17 +210,31 @@ function sendValues(capteur, res) {
 
 serveurAPI.get("/Ajax/Last24", function (req, res) {
 	capteur = req.query.capteur;
-	sendGraphValues(res, capteur)
+	nomValeur = req.query.nomValeur;
+	sendGraphValues(res, capteur, nomValeur)
 });
 
 serveurAPI.post("/Ajax/Last24", function (req, res) {
 	capteur = req.body.capteur;
-	sendGraphValues(res, capteur)
+	nomValeur = req.body.nomValeur;
+	sendGraphValues(res, capteur, nomValeur)
 });
 
-function sendGraphValues(res, capteur) {
+function sendGraphValues(res, capteur, nomValeur) {
 	reponse = [];
-	// TODO récupération des données sur 24h
+
+	//Récupération de la date actuelle
+	var today = new Date();
+	//Tedious corrige les valeurs de date de la DB pour correspondre à la timezone du serveur
+	//Cependant, la DB est déjà a la bonne timezone, il faut annuler cette correction
+	today.setHours(today.getHours() - (today.getTimezoneOffset() / 60));
+	//On set today à la dernière heure
+	today.setMinutes(0);
+	today.setSeconds(0);
+	today.setMilliseconds(0);
+
+	var yesterday = new Date(today.getTime());
+	yesterday.setDate(yesterday.getDate() - 1);
 
 	let db = new tedious.Connection(config);
 	db.on('connect', (err) => {
@@ -229,17 +242,45 @@ function sendGraphValues(res, capteur) {
 			console.log(err);
 			return;
 		}
-		request = new Request(requeteGet);
+		request = new Request(requeteGraph);
 		request.addParameter('Capteur', TYPES.NVarChar, capteur);
+		request.addParameter('Lib', TYPES.NVarChar, nomValeur);
+		request.addParameter('Yesterday', TYPES.DateTime, yesterday);
+		request.addParameter('Today', TYPES.DateTime, today);
+
+		//Heure du dernier enregistrement
+		var lastHeure = null;
+		//Nombre de valeurs enregistrée
+		var i = 0
 
 		//Enregistrement des valeurs des tuples dans reponse
+		//On enregistre des moyennes par heure
 		request.on('row', function (columns) {
-			reponse[columns[0].value] = columns[1].value
+			let value = columns[0].value
+			let date = new Date(columns[1].value);
+			//Si le tuple a une heure différente du dernier enregistrer
+			if(lastHeure == null || lastHeure !== (date.getHours()-1)){
+				//date est avancée de 2h à cause de la correction de tedious, et on enregistre la moyenne des valeurs enregistrée est indiqué pour l'heure suivante
+				//donc on enregistre lastHeure comme étant l'heure de date -1 (donc l'heure de l'enregistrement + 1)
+				//Exemple : la moyenne des valeurs de 8h à 9h est indiquée à 9h
+				lastHeure = (date.getHours()-1);
+				//Lorsqu'on change d'heure, on calcul la moyenne de l'heure précédente
+				if(i !== 0)
+					reponse[reponse.length - 1].value = Math.floor(reponse[reponse.length - 1].value / i);
+				//Puis on rentre l'objet contenant la moyenne de la prochaine heure calculée (avec un zéro non-significatif si besoin)
+				reponse.push({time: lastHeure.toString().padStart(2, "0"), value: 0});
+				i = 0;
+			}
+			reponse[reponse.length - 1].value += value;
+			i++;
 		});
 
 		//Lorsque la request se termine, on renvoie reponse
 		request.callback = () => {
 			db.close();
+			if(i !== 0)
+				reponse[reponse.length - 1].value = Math.floor(reponse[reponse.length - 1].value / i);
+			console.log(reponse);
 			res.jsonp(reponse);
 		}
 		db.execSql(request);

@@ -3,6 +3,6 @@
     "name": "DEV"
   },
   "config": {
-    "ip": "https://test.eai.fr"
+    "ip": "http://localhost:8080"
   }
 }
