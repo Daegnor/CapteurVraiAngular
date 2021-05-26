@@ -265,6 +265,8 @@ function sendGraphValues(res, capteur, nomValeur) {
 					reponse[reponse.length - 1].value = Math.floor(reponse[reponse.length - 1].value / i);
 				//Puis on rentre l'objet contenant la moyenne de la prochaine heure calculée (avec un zéro non-significatif si besoin)
 				reponse.push({time: lastHeure.toString().padStart(2, "0"), value: 0});
+				if(reponse[reponse.length - 1].time === "24")
+					reponse[reponse.length - 1].time = "00"
 				i = 0;
 			}
 			reponse[reponse.length - 1].value += value;

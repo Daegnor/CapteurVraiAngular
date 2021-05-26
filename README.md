@@ -159,8 +159,6 @@ Exemple :
 }
 ```
 
-- - 
-
 ## Développement
 
 ### API
