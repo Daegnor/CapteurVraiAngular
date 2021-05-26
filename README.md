@@ -109,20 +109,23 @@ Configurer l'accès à la base de données
 
 ```
 ...
+//Configuration de l'accès à la base de données
 var config = {
-    server: '',  //update me
-    authentication: {
-        type: 'default',
-        options: {
-            userName: '', //update me
-            password: ''  //update me
-        }
-    },
-    options: {
-        // If you are on Microsoft Azure, you need encryption:
-        encrypt: false,
-        database: ''  //update me
-    }
+	server: '',  //update me
+	authentication: {
+		type: 'default',
+		options: {
+			userName: '', //update me
+			password: ''  //update me
+		}
+	},
+	options: {
+		//On désactive la correction des heures à la timezone
+		useUTC: false,
+		// If you are on Microsoft Azure, you need encryption:
+		encrypt: false,
+		database: ''  //update me
+	}
 };
 ...
 ```

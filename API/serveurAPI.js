@@ -26,6 +26,8 @@ var config = {
 		}
 	},
 	options: {
+		//On désactive la correction des heures à la timezone
+		useUTC: false,
 		// If you are on Microsoft Azure, you need encryption:
 		encrypt: false,
 		database: ''  //update me
@@ -222,9 +224,6 @@ function sendGraphValues(res, capteur, nomValeur) {
 
 	//Récupération de la date actuelle
 	var today = new Date();
-	//Tedious corrige les valeurs de date de la DB pour correspondre à la timezone du serveur
-	//Cependant, la DB est déjà a la bonne timezone, il faut annuler cette correction
-	today.setHours(today.getHours() - (today.getTimezoneOffset() / 60));
 	//On set today à la dernière heure
 	today.setMinutes(0);
 	today.setSeconds(0);
@@ -255,12 +254,12 @@ function sendGraphValues(res, capteur, nomValeur) {
 		request.on('row', function (columns) {
 			let value = columns[0].value
 			let date = new Date(columns[1].value);
+			//console.log(date);
 			//Si le tuple a une heure différente du dernier enregistrer
-			if(lastHeure == null || lastHeure !== (date.getHours()-1)){
-				//date est avancée de 2h à cause de la correction de tedious, et la moyenne des valeurs enregistrée est indiqué pour l'heure suivante
-				//donc on enregistre lastHeure comme étant l'heure de date -1 (donc l'heure de l'enregistrement + 1)
+			if(lastHeure == null || lastHeure !== (date.getHours()+1)){
+				//La moyenne des valeurs enregistrée est indiqué pour l'heure suivante
 				//Exemple : la moyenne des valeurs de 8h à 9h est indiquée à 9h
-				lastHeure = (date.getHours()-1);
+				lastHeure = (date.getHours()+1);
 				//Lorsqu'on change d'heure, on calcul la moyenne de l'heure précédente
 				if(i !== 0)
 					reponse[reponse.length - 1].value = Math.floor(reponse[reponse.length - 1].value / i);
@@ -277,7 +276,6 @@ function sendGraphValues(res, capteur, nomValeur) {
 			db.close();
 			if(i !== 0)
 				reponse[reponse.length - 1].value = Math.floor(reponse[reponse.length - 1].value / i);
-			console.log(reponse);
 			res.jsonp(reponse);
 		}
 		db.execSql(request);
