@@ -1,4 +1,4 @@
-import {Component, forwardRef, OnDestroy, OnInit} from '@angular/core';
+import {Component, forwardRef, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {PowerComponent} from '../power/power.component';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -12,10 +12,10 @@ import {ActivatedRoute, Router} from '@angular/router';
 })
 /**
  * Classe HorlogeGraphComponent
- * Affiche les valeurs du capteurs à CO2/Température
+ * Affiche les valeurs du capteurs à CO2 ainsi que son évolution sur le temps
  * Hérite de PowerComponent
  */
-export class HorlogeGraphComponent extends PowerComponent implements OnInit, OnDestroy {
+export class HorlogeGraphComponent extends PowerComponent implements OnInit {
 	constructor(protected actRoute: ActivatedRoute, protected router: Router, protected http: HttpClient) {
 		super(actRoute, router, http);
 		this.id = 'horloge';
