@@ -140,7 +140,7 @@ var clientMQTT = mqtt.connect("mqtt://"+ adresseIP,{clientId:"nodejs_recept", po
 S'il s'agit d'une nouvelle installation, installer les package requis : 
 
 ```
-./installer_dependances_serveurNodeJS
+./installer_dependances_serveurAPI.sh
 ```
 
 ### Angular
