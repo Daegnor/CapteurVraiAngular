@@ -62,8 +62,8 @@ Par WinSCP :
 2. Configurer l'accès au Raspberry![image-20210518164259623](/images_doc/image-20210518164259623.png)
    1. Protocol : SFTP pour transfert par SSH
    2. Nom d'hôte : Adresse IP du Raspberry
-   3. Nom d'utilisateur : pi
-   4. Mot de passe : raspberry
+   3. Nom d'utilisateur : pi (par défaut)
+   4. Mot de passe : raspberry (par défaut)
 3. Cliquer sur "Connecter"
 4. ![image-20210518164537231](/images_doc/image-20210518164537231.png)
    1. Partie gauche : Fichiers locaux
@@ -72,10 +72,10 @@ Par WinSCP :
 ## Hiérarchie du dossier
 
 - dist -> Fichier de sortie des builds (non présent par défaut)
-- ServeurNodeJS -> Contient les fichiers pour faire l'API (à coté du serveur pour Angular)
+- ServeurAPI -> Contient les fichiers pour faire l'API (à coté du serveur pour Angular)
   - init.sql -> Fichier d'initialisation pour la base de données
-  - installer_dependances_serveurNodeJS.sh -> Script pour installer les dépendances du serveur
-  - serveurNodeJS -> Fichier NodeJS du serveur
+  - installer_dependances_serveurAPI.sh -> Script pour installer les dépendances du serveur
+  - serveurAPI -> Fichier NodeJS du serveur
 - src
   - app -> Dossier contenant les fichiers du site web
     - horloge -> Dossier contenant le contrôleur (component en Angular) pour l'horloge (page par défaut lorsqu'on arrive sur le site)
@@ -103,7 +103,7 @@ Par WinSCP :
 
 ## Configuration
 
-### NodeJS
+### API
 
 Configurer l'accès à la base de données
 
@@ -160,9 +160,9 @@ Exemple :
 
 ## Développement
 
-### NodeJS
+### API
 
-Le fichier est intégralement commenté.
+Le fichier serveurAPI.js est intégralement commenté.
 
 Pour les adresses des valeurs des capteurs Janitza, elles sont disponibles sur la documentation fournie : https://www.janitza.com/manuals.html?file=files/download/manuals/current/UMG604-PRO/janitza-mal-umg604pro-en.pdf
 
@@ -203,10 +203,10 @@ Puis placer les fichiers du répertoire dist dans un serveur web. Rediriger tout
 
 ## Lancement 
 
-Pour lancer le serveurNodeJS :
+Pour lancer l'API :
 
 ```
-nodejs serveurNodeJS
+nodejs serveurAPI
 ```
 
  Pour le site Angular (en développement, sinon se référer à Passer en production) :
@@ -215,10 +215,10 @@ nodejs serveurNodeJS
 npm start
 ```
 
-En production, un script peut être fait pour lancer serveurNodeJS
+En production, un script peut être fait pour lancer l'API
 
 ```
-sudo nano /etc/systemd/system/serveurNodeJS.service
+sudo nano /etc/systemd/system/serveurAPI.service
 ```
 
 ```
@@ -231,7 +231,7 @@ WantedBy=multi-user.target
 
 [Service]
 ExecStartPre=/bin/sleep 60
-ExecStart=/usr/bin/nodejs [chemin vers le fichier]/serveurNodeJS.js
+ExecStart=/usr/bin/nodejs [chemin vers le fichier]/serveurAPI.js
 Type=simple
 User=root
 WorkingDirectory=[chemin vers le fichier]
@@ -242,6 +242,6 @@ Puis
 
 ```
 sudo systemctl daemon-reload
-sudo systemctl enable serveurNodeJS.service
+sudo systemctl enable serveurAPI.service
 ```
 
