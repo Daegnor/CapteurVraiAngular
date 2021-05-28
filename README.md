@@ -72,7 +72,7 @@ Par WinSCP :
 ## Hiérarchie du dossier
 
 - dist -> Fichier de sortie des builds (non présent par défaut)
-- ServeurAPI -> Contient les fichiers pour faire l'API (à coté du serveur pour Angular)
+- API -> Contient les fichiers pour faire l'API (à coté du serveur pour Angular)
   - init.sql -> Fichier d'initialisation pour la base de données
   - installer_dependances_serveurAPI.sh -> Script pour installer les dépendances du serveur
   - serveurAPI -> Fichier NodeJS du serveur
